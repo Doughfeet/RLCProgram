@@ -16,8 +16,10 @@ namespace RLCProgram
     public partial class Form1 : Form
     {
         private Thread thread;
-        private double counter = 0;
-        private double[] dataArray = new double[60];
+        double count = 0;
+        private int[] counter = new int[] { 10, 0, -10, 0 };
+        private double[] sinDataArray = new double[30];
+        private double[] cosDataArray = new double[30];
 
         public Form1()
         {
@@ -29,7 +31,6 @@ namespace RLCProgram
 
         }
 
-
         private void GetDataForSpline()
         {
 
@@ -37,16 +38,21 @@ namespace RLCProgram
 
             while (true)
             {
-                counter = counter + 1;
-                dataArray[dataArray.Length - 1] = Math.Round(Math.Sin(1 * counter), 0);
 
-                Array.Copy(dataArray, 1, dataArray, 0, dataArray.Length - 1);
+                sinDataArray[sinDataArray.Length - 1] = Math.Sin(count);
+                Array.Copy(sinDataArray, 1, sinDataArray, 0, sinDataArray.Length - 1);
+
+                cosDataArray[cosDataArray.Length - 1] = Math.Cos(count);
+                Array.Copy(cosDataArray, 1, cosDataArray, 0, cosDataArray.Length - 1);
+
 
                 if (chartControl.IsHandleCreated)
                 {
                     this.Invoke((MethodInvoker)delegate { UpdateDataChart(); });
+                    this.Invoke((MethodInvoker)delegate { UpdateDataChart2(); });
                 }
-                Thread.Sleep(100);
+                count = count + 0.6;
+                Thread.Sleep(250);
             }
 
 
@@ -56,9 +62,20 @@ namespace RLCProgram
         {
             chartControl.Series["Series1"].Points.Clear();
 
-            for (int i = 0; i < dataArray.Length - 1; ++i)
+            for (int i = 0; i < sinDataArray.Length - 1; ++i)
             {
-                chartControl.Series["Series1"].Points.AddY(dataArray[i]);
+                chartControl.Series["Series1"].Points.AddY(sinDataArray[i]);
+            }
+
+        }
+
+        private void UpdateDataChart2()
+        {
+            chartControl.Series["Series2"].Points.Clear();
+
+            for (int i = 0; i < cosDataArray.Length - 1; ++i)
+            {
+                chartControl.Series["Series2"].Points.AddY(cosDataArray[i]);
             }
         }
         private void StartButton1_Click(object sender, EventArgs e)
@@ -67,30 +84,5 @@ namespace RLCProgram
             thread.IsBackground = true;
             thread.Start();
         }
-
-
-
-        private void SplineChartExample()
-        {
-            //this.chartControl.Series.Clear();
-
-            //this.chartControl.Titles.Add("Total Income");
-
-            //Series series = this.chartControl.Series.Add("Total Income");
-            //series.ChartType = SeriesChartType.Spline;
-
-            //for (int i = 0; i < 20; i++)
-            //{
-            //    series.Points.Add(Math.Sin(i));
-            //}
-            //series.Points.AddXY("September", 100);
-            //series.Points.AddXY("Obtober", 300);
-            //series.Points.AddXY("November", 800);
-            //series.Points.AddXY("December", 200);
-            //series.Points.AddXY("January", 600);
-            //series.Points.AddXY("February", 400);
-        }
-
-
     }
 }
