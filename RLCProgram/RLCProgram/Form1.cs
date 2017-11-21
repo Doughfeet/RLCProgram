@@ -57,15 +57,15 @@ namespace RLCProgram
             R_NumericUpDown3.Increment = 1;
             R_NumericUpDown3.Minimum = 0;
             R_NumericUpDown3.Maximum = 10000;
-            R_NumericUpDown3.Value = 100;
+            R_NumericUpDown3.Value = 2;
         }
         private void Capacitance()
         {
-            C_NumericUpDown4.Increment = 0.1M;
-            C_NumericUpDown4.DecimalPlaces = 1;
-            C_NumericUpDown4.Minimum = 0M;
-            C_NumericUpDown4.Maximum = 500M;
-            C_NumericUpDown4.Value = 100M;
+            C_NumericUpDown4.Increment = 0.01M;
+            C_NumericUpDown4.DecimalPlaces = 3;
+            C_NumericUpDown4.Minimum = 0.001M;
+            C_NumericUpDown4.Maximum = 0.100M;
+            C_NumericUpDown4.Value = 0.015M;
             //uF 10^-6
         }
         private void Inductance()
@@ -74,7 +74,7 @@ namespace RLCProgram
             L_NumericUpDown5.DecimalPlaces = 1;
             L_NumericUpDown5.Minimum = 0M;
             L_NumericUpDown5.Maximum = 200M;
-            L_NumericUpDown5.Value = 150M;
+            L_NumericUpDown5.Value = 10M;
         }
 
         private void Freq()
@@ -113,7 +113,7 @@ namespace RLCProgram
         }
         private double CapacitiveReactance()
         {
-            return 1 / (2 * Math.PI * Frequence * Capacitor * Math.Pow(10, -6));
+            return 1 / (Capacitor * Math.Pow(10, -6));
         }
 
 
@@ -140,7 +140,7 @@ namespace RLCProgram
 
 
                 //Purely CAPACITOR circut, is in phase with the applied voltage
-                CurrentCapacitorArray[CurrentCapacitorArray.Length - 1] = (Amplitude / Capacitor) * Math.Sin(2 * Math.PI * Time - (Math.PI / 2));
+                CurrentCapacitorArray[CurrentCapacitorArray.Length - 1] = (Amplitude / (1/Capacitor)) * Math.Sin(2 * Math.PI * Time - (Math.PI / 2));
                 Array.Copy(CurrentCapacitorArray, 1, CurrentCapacitorArray, 0, CurrentCapacitorArray.Length - 1);
 
 
@@ -160,42 +160,57 @@ namespace RLCProgram
 
         private void UpdateDataChart1()
         {
-            chartControl.Series["Series1"].Points.Clear();
-            label7.Text = Math.Sin(400).ToString();
+            chartControl.Series["Vmax"].Points.Clear();
             for (int i = 0; i < sinDataArray.Length - 1; ++i)
             {
-                chartControl.Series["Series1"].Points.AddY(sinDataArray[i]);
+                chartControl.Series["Vmax"].Points.AddY(sinDataArray[i]);
             }
         }
 
         private void UpdateDataChart2()
         {
-            chartControl.Series["Series2"].Points.Clear();
-            
-            for (int i = 0; i < CurrentResistiveArray.Length - 1; ++i)
+            if (RcheckBox1.Checked)
             {
-                label7.Text = CurrentResistiveArray[i].ToString();
-                chartControl.Series["Series2"].Points.AddY(CurrentResistiveArray[i]);
+                chartControl.Series["CurrentResistive"].Points.Clear();
+
+                for (int i = 0; i < CurrentResistiveArray.Length - 1; ++i)
+                {
+                    chartControl.Series["CurrentResistive"].Points.AddY(CurrentResistiveArray[i]);
+                }
             }
+            else
+                chartControl.Series["CurrentResistive"].Points.Clear();
+
         }
 
         private void UpdateDataChart3()
         {
-            chartControl.Series["Series3"].Points.Clear();
-
-            for (int i = 0; i < CurrentInductorArray.Length - 1; ++i)
+            if (IcheckBox2.Checked)
             {
-                chartControl.Series["Series3"].Points.AddY(CurrentInductorArray[i]);
+                chartControl.Series["CurrentInductor"].Points.Clear();
+
+                for (int i = 0; i < CurrentInductorArray.Length - 1; ++i)
+                {
+                    chartControl.Series["CurrentInductor"].Points.AddY(CurrentInductorArray[i]);
+                }
             }
+            else
+                chartControl.Series["CurrentInductor"].Points.Clear();
         }
         private void UpdateDataChart4()
         {
-            chartControl.Series["Series4"].Points.Clear();
-
-            for (int i = 0; i < CurrentCapacitorArray.Length - 1; ++i)
+            if (CcheckBox3.Checked)
             {
-                chartControl.Series["Series4"].Points.AddY(CurrentCapacitorArray[i]);
+                chartControl.Series["CurrentCapacitor"].Points.Clear();
+
+                for (int i = 0; i < CurrentCapacitorArray.Length - 1; ++i)
+                {
+                    chartControl.Series["CurrentCapacitor"].Points.AddY(CurrentCapacitorArray[i]);
+                }
             }
+            else
+                chartControl.Series["CurrentCapacitor"].Points.Clear();
+
         }
 
         private void StartButton1_Click(object sender, EventArgs e)
@@ -204,7 +219,5 @@ namespace RLCProgram
             thread.IsBackground = true;
             thread.Start();
         }
-
-
     }
 }
